@@ -1,0 +1,130 @@
+<!--
+  ~ Copyright (c) 2022 Contributors to the Eclipse Foundation
+  ~
+  ~ See the NOTICE file(s) distributed with this work for additional
+  ~ information regarding copyright ownership.
+  ~
+  ~ This program and the accompanying materials are made available under the
+  ~ terms of the Eclipse Public License 2.0 which is available at
+  ~ http://www.eclipse.org/legal/epl-2.0
+  ~
+  ~ SPDX-License-Identifier: EPL-2.0
+  -->
+<html lang="en">
+
+<head>
+    <title>Eclipse Ditto™ explorer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.3/font/bootstrap-icons.min.css"
+        rel="stylesheet"
+        integrity="sha512-YzwGgFdO1NQw1CZkPoGyRkEnUTxPSbGWXvGiXrWk8IeSqdyci0dEDYdLLjMxq1zCoU0QBa4kHAFiRhUL3z2bow=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="icon" type="image/png"
+        href="https://raw.githubusercontent.com/eclipse/ditto/master/documentation/src/main/resources/images/favicon-16x16.png"
+        sizes="16x16">
+    <link rel="icon" type="image/png"
+        href="https://raw.githubusercontent.com/eclipse/ditto/master/documentation/src/main/resources/images/favicon-32x32.png"
+        sizes="32x32">
+    <link rel="icon" type="image/png"
+        href="https://raw.githubusercontent.com/eclipse/ditto/master/documentation/src/main/resources/images/favicon-96x96.png"
+        sizes="96x96">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.19.0/ace.min.js"
+        integrity="sha512-7ar5DoGr5xiRstr9B0e9BkQAc42juvRXosAEAXuOKZSL/4C93WpIFthgzZibRAau0kB0NJszECL02exq3IPc/w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="module" src="./dist/main.js"></script>
+    <link rel="stylesheet" href="./dist/main.css" />
+</head>
+
+<body>
+    <nav class="navbar fixed-top navbar-expand-sm flex-sm-nowrap bg-info navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand"><img
+                    src="https://raw.githubusercontent.com/eclipse/ditto/master/documentation/src/main/resources/images/ditto_allwhite_symbolonly.svg"
+                    style="width:39px;" alt="Eclipse Ditto™"></a>
+            <a class="navbar-brand"><img
+                    src="https://raw.githubusercontent.com/eclipse/ditto/master/documentation/src/main/resources/images/ditto_allwhite_textonly.svg"
+                    style="width:63px;" alt="Eclipse Ditto™"></a>
+            <a class="navbar-brand">explorer</a>
+            <div class="navbar-collapse collapse w-100 justify-content-center" id="mainNavbar">
+                <ul class="navbar-nav text-center">
+                    <li class="nav-item" id="tabThings">
+                        <a class="nav-link active" data-bs-target="#collapseThings:not(.show)" data-bs-toggle="collapse">
+                            Things
+                        </a>
+                    </li>
+                    <li class="nav-item" id="tabPolicies">
+                        <a class="nav-link" data-bs-target="#collapsePolicies:not(.show)" data-bs-toggle="collapse">
+                            Policies
+                        </a>
+                    </li>
+                    <li class="nav-item" id="tabConnections" data-auth="devOps">
+                        <a class="nav-link" data-bs-target="#collapseConnections:not(.show)" data-bs-toggle="collapse">
+                            Connections
+                        </a>
+                    </li>
+                    <li class="nav-item" id="tabOperations" data-auth="devOps">
+                        <a class="nav-link" data-bs-target="#collapseOperations:not(.show)" data-bs-toggle="collapse">
+                            Operations
+                        </a>
+                    </li>
+                    <li class="nav-item" id="tabEnvironments">
+                        <a class="nav-link" data-bs-target="#collapseSettings:not(.show)" data-bs-toggle="collapse">
+                            Environments
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <ul class="navbar-nav w-50">
+                <a class="nav-link active">Environment:</a>
+                <select class="form-select form-select-sm" id="environmentSelector"
+                    style="margin-top: auto; margin-bottom: auto;"></select>
+                <button id="authorize" class="btn btn-outline-light btn-sm" style="margin-left:5px;"
+                    data-bs-toggle="modal" data-bs-target="#authorizationModal">Authorize</button>
+            </ul>
+        </div>
+    </nav>
+    <div class="container-fluid py-3 overflowauto" id="page-content">
+        <div class="collapse show" id="collapseThings" data-bs-parent="#page-content">
+            <div id="thingsHTML"></div>
+            <div id="featuresHTML"></div>
+            <div id="messagesIncomingHTML"></div>
+        </div>
+        <div class="collapse" id=collapsePolicies data-bs-parent="#page-content">
+            <div id="policyHTML"></div>
+        </div>
+        <div class="collapse" id=collapseConnections data-bs-parent="#page-content">
+            <div id="connectionsHTML"></div>
+        </div>
+        <div class="collapse" id=collapseOperations data-bs-parent="#page-content">
+            <div id="operationsHTML"></div>
+        </div>
+        <div class="collapse" id="collapseSettings" data-bs-parent="#page-content">
+            <div id="environmentsHTML"></div>
+        </div>
+    </div>
+    <!-- Notifications to user ----------------------------------------------------------------->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1205; right: 0; bottom: 0" id="toastContainer">      
+        <div class="toast hide bg-success" data-bs-delay="2000" id="successToast">
+            <div class="toast-header" id="successHeader">
+            </div>
+            <div class="toast-body" id=successBody></div>
+        </div>
+    </div>
+    <!-- Modals ------------------------------------------------------------------------------->
+    <div id="authorizationHTML"></div>
+    <div id="fieldsHTML"></div>
+    <div class="modal fade" id="modalConfirm" tabindex="-1">
+        <div class="modal-dialog dialog-sm">
+            <div class="modal-content">
+                <div class="modal-body" id="modalBodyConfirm"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" id="buttonConfirmed">Delete</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modalCrudEdit"></div>
+</body>
+</html>
